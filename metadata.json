@@ -1,0 +1,7 @@
+{
+  "name": "Copy of Professor Claire - Your ESL Mentor",
+  "description": "An interactive ESL learning application featuring Professor Claire, a patient AI tutor powered by Gemini Live API for real-time voice conversation and grammatical corrections.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
