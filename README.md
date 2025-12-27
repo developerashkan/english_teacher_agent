@@ -4,9 +4,9 @@
 
 # Voice Agent: AI English Teacher 
 
-# Run and deploy your AI Studio app
+### Run and deploy your AI Studio app
 
-This contains everything you need to run your app locally.
+### This contains everything you need to run your app locally.
 
 ## Run Locally
 
