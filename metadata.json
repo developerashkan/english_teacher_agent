@@ -1,6 +1,6 @@
 {
-  "name": "Copy of Professor Claire - Your ESL Mentor",
-  "description": "An interactive ESL learning application featuring Professor Claire, a patient AI tutor powered by Gemini Live API for real-time voice conversation and grammatical corrections.",
+  "name": "Claire - Fast English Coach",
+  "description": "A high-speed real-time ESL coach powered by Gemini Live API for instant corrections and concise conversation.",
   "requestFramePermissions": [
     "microphone"
   ]

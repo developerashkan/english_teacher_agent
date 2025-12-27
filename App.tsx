@@ -4,24 +4,18 @@ import { GoogleGenAI, Modality } from '@google/genai';
 import { TranscriptionMessage, SessionState } from './types';
 import { decode, encode, decodeAudioData, createBlobFromPCM } from './utils/audio';
 
-// System prompt as provided in the instructions
-const SYSTEM_PROMPT = `Role: You are "Professor Claire," a patient, encouraging, and highly observant English as a Second Language (ESL) teacher. Your goal is to help me improve my conversational English through natural dialogue.
+// Refined System prompt for maximum speed and zero-delay feedback
+const SYSTEM_PROMPT = `Role: You are Claire, a fast-responding ESL coach. Your goal is real-time correction with zero delay.
 
-Instructional Style:
-1. Active Listening: Listen closely to everything I say. Do not ignore errors.
-2. Instant Correction: If I make a grammatical mistake or use an awkward phrase, gently interrupt or wait for the end of my sentence to provide the correct version.
-3. Pronunciation Focus: Pay special attention to my pronunciation. If I mispronounce a word, say: "Wait, let's try that word again. It’s pronounced [Phonetic Spelling]. Try saying it back to me."
-4. Natural Flow: After correcting me, keep the conversation going by asking a follow-up question related to our topic.
+Core Directive: Keep every response under 30 words. Do not give long explanations unless I ask "Why?". Speed and flow are the absolute priorities.
 
-Tone and Voice:
-- Warm, professional, and supportive.
-- Speak at a moderate pace—not too fast, but not so slow that it feels unnatural.
-- Use "Encouraging Reinforcement" (e.g., "That was a great use of the past tense! Now, let's look at...").
+Correction Protocol:
+- Immediate Correction: If I make a mistake, state the correction clearly and move on instantly.
+- Pronunciation: If I misspeak, say: "Try saying [Word] like this: [Simple Phonetic]."
+- No Lectures: Do not explain grammar rules unless I am explicitly stuck or ask "Why?".
+- Natural Transition: Correct me, then immediately ask a very short question to keep the conversation flowing.
 
-Rules for Correction:
-- Grammar: Fix tense shifts, subject-verb agreement, and preposition errors.
-- Vocabulary: Suggest "better" or "more natural" words if basic words are repeated.
-- Feedback Loop: If I make a mistake, explain why it was wrong in one brief sentence before moving on.`;
+Voice Style: Friendly, direct, and concise. Use a natural, conversational pace. Zero delay is the mission.`;
 
 const App: React.FC = () => {
   const [sessionState, setSessionState] = useState<SessionState>(SessionState.DISCONNECTED);
@@ -99,7 +93,6 @@ const App: React.FC = () => {
             scriptProcessor.connect(inputAudioCtxRef.current!.destination);
           },
           onmessage: async (message) => {
-            // Handle transcriptions
             if (message.serverContent?.inputTranscription) {
               currentInputTransRef.current += message.serverContent.inputTranscription.text;
             }
@@ -117,7 +110,6 @@ const App: React.FC = () => {
               currentOutputTransRef.current = '';
             }
 
-            // Handle audio
             const base64Audio = message.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
             if (base64Audio && outputAudioCtxRef.current) {
               setIsProfessorSpeaking(true);
@@ -147,7 +139,7 @@ const App: React.FC = () => {
           },
           onerror: (err) => {
             console.error("Live session error:", err);
-            setErrorMessage("Connection lost. Please check your internet and try again.");
+            setErrorMessage("Session timeout. Please restart for zero-delay coaching.");
             setSessionState(SessionState.ERROR);
           },
           onclose: () => {
@@ -159,7 +151,7 @@ const App: React.FC = () => {
       sessionRef.current = await sessionPromise;
     } catch (err: any) {
       console.error("Failed to start session:", err);
-      setErrorMessage(err.message || "Could not connect to Professor Claire.");
+      setErrorMessage(err.message || "Failed to connect to Claire.");
       setSessionState(SessionState.ERROR);
     }
   };
@@ -185,12 +177,12 @@ const App: React.FC = () => {
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-900 leading-tight">Professor Claire</h1>
-              <p className="text-sm text-indigo-600 font-medium">Your Patient ESL Tutor</p>
+              <h1 className="text-xl font-bold text-slate-900 leading-tight">Claire</h1>
+              <p className="text-sm text-indigo-600 font-medium tracking-tight">Fast ESL Coach</p>
             </div>
           </div>
           
@@ -214,12 +206,12 @@ const App: React.FC = () => {
               <div className="h-full flex flex-col items-center justify-center text-center space-y-4 px-4">
                 <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-2">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-slate-700">Welcome to Professor Claire's Classroom</h3>
+                <h3 className="text-lg font-semibold text-slate-700">Rapid ESL Coach</h3>
                 <p className="text-slate-500 max-w-sm text-sm">
-                  Click the button below to start a voice conversation. She'll help you with grammar, pronunciation, and vocabulary in real-time.
+                  Instant corrections. Under 30 words per response. Claire is optimized for zero-delay flow.
                 </p>
               </div>
             )}
@@ -240,9 +232,7 @@ const App: React.FC = () => {
             {isProfessorSpeaking && (
                <div className="flex justify-start">
                   <div className="bg-white border border-slate-100 rounded-2xl rounded-tl-none px-5 py-3 shadow-sm flex items-center space-x-1">
-                    <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" />
                   </div>
                </div>
             )}
@@ -250,12 +240,19 @@ const App: React.FC = () => {
 
           {/* Error Message */}
           {errorMessage && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 w-4/5">
-              <div className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-2 rounded-xl text-xs flex items-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{errorMessage}</span>
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-4/5 z-10">
+              <div className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-2 rounded-xl text-xs flex items-center justify-between shadow-lg">
+                <div className="flex items-center space-x-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{errorMessage}</span>
+                </div>
+                <button onClick={() => setErrorMessage(null)} className="text-rose-400 hover:text-rose-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
               </div>
             </div>
           )}
@@ -267,42 +264,37 @@ const App: React.FC = () => {
             {sessionState === SessionState.DISCONNECTED || sessionState === SessionState.ERROR ? (
               <button
                 onClick={handleStartSession}
-                className="group relative flex items-center justify-center w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-semibold text-lg transition-all shadow-xl shadow-indigo-200 hover:shadow-indigo-300 active:scale-[0.98]"
+                className="group relative flex items-center justify-center w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-semibold text-lg transition-all shadow-xl shadow-indigo-100 hover:shadow-indigo-200 active:scale-[0.98]"
               >
-                <span className="mr-2">Enter the Classroom</span>
+                <span className="mr-2">Start Fast Session</span>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </button>
             ) : (
               <div className="w-full space-y-4">
-                <div className="flex items-center justify-center space-x-4">
-                   {/* Speaking Visualizer (Static placeholder) */}
-                   <div className="flex items-end h-8 space-x-1 px-4">
-                      {[...Array(8)].map((_, i) => (
+                <div className="flex items-center justify-center">
+                   <div className="flex items-end h-8 space-x-1.5">
+                      {[...Array(6)].map((_, i) => (
                         <div 
                           key={i} 
-                          className={`w-1.5 bg-indigo-400 rounded-full ${sessionState === SessionState.CONNECTED ? 'animate-pulse' : ''}`}
-                          style={{ height: `${20 + Math.random() * 80}%`, animationDelay: `${i * 100}ms` }}
+                          className={`w-1 bg-indigo-500 rounded-full transition-all duration-75 ${sessionState === SessionState.CONNECTED ? 'animate-pulse' : ''}`}
+                          style={{ height: `${30 + Math.random() * 70}%`, animationDelay: `${i * 150}ms` }}
                         />
                       ))}
                    </div>
                 </div>
                 <button
                   onClick={handleStopSession}
-                  className="w-full py-4 bg-white border-2 border-slate-200 hover:border-rose-200 hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-2xl font-semibold text-lg transition-all flex items-center justify-center"
+                  className="w-full py-4 bg-white border border-slate-200 hover:border-rose-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-2xl font-semibold text-base transition-all flex items-center justify-center shadow-sm"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                  End Lesson
+                  Stop Session
                 </button>
               </div>
             )}
-            
-            <p className="mt-4 text-[10px] uppercase tracking-widest font-bold text-slate-400">
-              Powered by Gemini 2.5 Live
-            </p>
           </div>
         </div>
       </div>
